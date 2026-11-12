@@ -95,15 +95,15 @@ class PairStats:
 
     def update(self, fa: Tensor, fb: Tensor) -> None:
         """Add a batch of feature activations [n, k] for the same tokens on both models."""
-        a, b = fa.double().cpu(), fb.double().cpu()
+        a, b = fa.double(), fb.double()  # reduce on the inputs' device; only [k]-sized sums move to CPU
         self.n += len(a)
-        self.sum_a += a.sum(0)
-        self.sum_b += b.sum(0)
-        self.sum_aa += (a * a).sum(0)
-        self.sum_bb += (b * b).sum(0)
-        self.sum_ab += (a * b).sum(0)
-        self.count_a += (a > 0).sum(0)
-        self.count_b += (b > 0).sum(0)
+        self.sum_a += a.sum(0).cpu()
+        self.sum_b += b.sum(0).cpu()
+        self.sum_aa += (a * a).sum(0).cpu()
+        self.sum_bb += (b * b).sum(0).cpu()
+        self.sum_ab += (a * b).sum(0).cpu()
+        self.count_a += (a > 0).sum(0).cpu()
+        self.count_b += (b > 0).sum(0).cpu()
 
     def summary(self, min_count: int = 10, feature_idx: Tensor | None = None) -> dict:
         """Feature preservation among features that fired at least `min_count` times on the reference.
