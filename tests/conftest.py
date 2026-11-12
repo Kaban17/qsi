@@ -1,0 +1,45 @@
+import pytest
+import torch
+from tokenizers import Regex, Tokenizer, decoders, models, pre_tokenizers
+from transformers import Gemma2Config, Gemma2ForCausalLM, PreTrainedTokenizerFast
+
+CHARS = "abcdefghijklmnopqrstuvwxyz0123456789 <>.,!?'"
+SPECIALS = ["<pad>", "<bos>", "<eos>", "<unk>"]
+
+
+@pytest.fixture
+def tiny_model():
+    torch.manual_seed(0)
+    config = Gemma2Config(
+        vocab_size=64,
+        hidden_size=32,
+        intermediate_size=64,
+        num_hidden_layers=3,
+        num_attention_heads=2,
+        num_key_value_heads=2,
+        head_dim=16,
+        pad_token_id=0,
+        bos_token_id=1,
+        eos_token_id=2,
+        attn_implementation="eager",
+    )
+    return Gemma2ForCausalLM(config).eval()
+
+
+@pytest.fixture
+def tiny_tokenizer():
+    vocab = {tok: i for i, tok in enumerate(SPECIALS + list(CHARS))}
+    assert len(vocab) <= 64
+    tok = Tokenizer(models.WordLevel(vocab, unk_token="<unk>"))
+    tok.pre_tokenizer = pre_tokenizers.Split(Regex("."), behavior="isolated")
+    tok.decoder = decoders.Fuse()
+    fast = PreTrainedTokenizerFast(
+        tokenizer_object=tok,
+        bos_token="<bos>",
+        eos_token="<eos>",
+        pad_token="<pad>",
+        unk_token="<unk>",
+        padding_side="left",
+    )
+    fast.chat_template = "{{ bos_token }}{% for m in messages %}<{{ m['content'] }}>{% endfor %}"
+    return fast
