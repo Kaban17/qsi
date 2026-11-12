@@ -43,3 +43,27 @@ def tiny_tokenizer():
     )
     fast.chat_template = "{{ bos_token }}{% for m in messages %}<{{ m['content'] }}>{% endfor %}"
     return fast
+
+
+@pytest.fixture
+def tiny_loader(tiny_model, tiny_tokenizer):
+    """Stands in for qsi.models.load_model; records which configurations were loaded."""
+    calls = []
+
+    def loader(name):
+        calls.append(name)
+        return tiny_model, tiny_tokenizer
+
+    loader.calls = calls
+    return loader
+
+
+@pytest.fixture
+def tiny_splits():
+    from qsi.data import SPLIT_SIZES, Prompt
+
+    words = ["abc", "hello", "xy", "test me"]
+    return {
+        split: [Prompt(f"{split}-{i:03d}", f"{w} {split[:8]} {i}", split) for i, w in enumerate(words)]
+        for split in SPLIT_SIZES
+    }
