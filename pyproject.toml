@@ -15,7 +15,12 @@ dependencies = [
 
 [dependency-groups]
 colab = ["bitsandbytes", "accelerate"]
-dev = ["pytest", "jupyter", "nbformat"]
+dev = [
+    "pytest",
+    "jupyter",
+    "nbformat",
+    "socksio>=1.0.0",
+]
 
 [build-system]
 requires = ["hatchling"]
