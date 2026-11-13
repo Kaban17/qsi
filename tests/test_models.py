@@ -37,3 +37,28 @@ def test_parse_config_rejects(name):
 
 def test_get_blocks(tiny_model):
     assert len(get_blocks(tiny_model)) == 3
+
+
+@pytest.mark.parametrize("name", ["bnb-8bit", "bnb-nf4"])
+def test_bnb_configs_load_in_float16(monkeypatch, name):
+    """Without an explicit dtype the unquantized parts load as bfloat16, which a T4 only emulates."""
+    import torch
+    import transformers
+    from torch import nn
+
+    from qsi.models import load_model
+
+    seen = {}
+
+    class FakeTokenizer:
+        padding_side = "right"
+
+    def fake_model(model_id, **kwargs):
+        seen.update(kwargs)
+        return nn.Linear(1, 1)
+
+    monkeypatch.setattr(transformers.AutoTokenizer, "from_pretrained", lambda *a, **k: FakeTokenizer())
+    monkeypatch.setattr(transformers.AutoModelForCausalLM, "from_pretrained", fake_model)
+    load_model(name)
+    assert seen["torch_dtype"] == torch.float16
+    assert seen["quantization_config"] is not None

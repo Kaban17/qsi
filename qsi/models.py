@@ -54,7 +54,11 @@ def load_model(name: str, model_id: str = MODEL_ID):
             quant = BitsAndBytesConfig(
                 load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16
             )
-        model = AutoModelForCausalLM.from_pretrained(model_id, quantization_config=quant, device_map="auto")
+        # float16 on purpose: without it the unquantized parts load as bfloat16, which a T4 only
+        # emulates, and bitsandbytes then casts (and logs a warning) on every matmul.
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, quantization_config=quant, torch_dtype=torch.float16, device_map="auto"
+        )
     else:
         model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=torch.float16, device_map="auto")
         if spec.kind == "rtn":
