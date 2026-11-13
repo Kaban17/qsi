@@ -7,3 +7,5 @@ __pycache__/
 *.tmp
 results/**/generations.jsonl
 results/**/resid_layer*.pt
+.env
+.env.*
