@@ -10,3 +10,4 @@ results/**/resid_layer*.pt
 .env
 .env.*
 results_smoke/
+.DS_Store
