@@ -2,7 +2,7 @@
 name = "qsi"
 version = "0.1.0"
 description = "How weight quantization affects safety behaviour and interpretable features of an LLM"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "torch",
     "transformers>=4.45",
