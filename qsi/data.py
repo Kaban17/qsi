@@ -95,7 +95,7 @@ def load_wikitext_chunks(tokenizer, n_chunks: int = 40, chunk_len: int = 512) ->
     """The first `n_chunks` consecutive `chunk_len`-token windows of the WikiText-2 test set."""
     from datasets import load_dataset
 
-    rows = load_dataset("wikitext", "wikitext-2-raw-v1", split="test")["text"]
+    rows = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="test")["text"]
     ids = tokenizer("\n\n".join(rows), add_special_tokens=False, return_tensors="pt").input_ids[0]
     if len(ids) < n_chunks * chunk_len:
         raise ValueError(f"WikiText: need {n_chunks * chunk_len} tokens, got {len(ids)}")
