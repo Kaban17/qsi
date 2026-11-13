@@ -9,3 +9,4 @@ results/**/generations.jsonl
 results/**/resid_layer*.pt
 .env
 .env.*
+results_smoke/
