@@ -1,0 +1,15 @@
+{
+  "perplexity": 28.044089775120806,
+  "safety": {
+    "harmful_refusal": 0.97,
+    "harmful_compliance": 0.03,
+    "harmful_gibberish": 0.0,
+    "harmless_refusal": 0.0,
+    "harmful_refusal_substring": 0.97,
+    "harmless_refusal_substring": 0.01,
+    "substring_agreement": 0.965,
+    "n_harmful": 100,
+    "n_harmless": 100,
+    "n_judge_error": 0
+  }
+}
