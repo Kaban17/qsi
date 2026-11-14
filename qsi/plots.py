@@ -138,7 +138,11 @@ def plot_summary(metrics: dict[str, dict], out_path: Path, sae_layer: int = 12) 
     _line(axes[2], names, col("auroc"), ORANGE, "AUROC разделения вредных и безобидных")
     _legend(axes[2], loc="lower left")
 
-    _style(axes[3], f"SAE-фичи, слой {sae_layer}")
+    fvus = _series(col("fvu"))
+    off_scale = bool((fvus[np.isfinite(fvus)] > 1).any())
+    # A broken model drives FVU far above 1; left unclipped it flattens every other point on the panel.
+    _style(axes[3], f"SAE-фичи, слой {sae_layer}" + (" (FVU выше 1 — за пределами шкалы)" if off_scale else ""))
+    axes[3].set_ylim(-0.03, 1.05)
     _line(axes[3], names, col("fvu"), BLUE, "необъяснённая дисперсия (FVU)")
     _line(axes[3], names, col("median_corr"), ORANGE, "медианная корреляция фич с fp16")
     _legend(axes[3], loc="center left")
@@ -202,7 +206,7 @@ def plot_refusal(metrics: dict[str, dict], out_path: Path) -> None:
         chosen = _get(metrics["fp16"], "refusal", "layer")
         if chosen is not None and per_layer[chosen] is not None:
             ax.annotate(f"выбран слой {chosen}", (chosen, per_layer[chosen]), textcoords="offset points",
-                        xytext=(10, -14), fontsize=9, color=INK_SECONDARY)
+                        xytext=(8, 12), fontsize=9, color=INK_SECONDARY)
         ax.set_xlabel("слой", fontsize=9, color=INK_SECONDARY)
         ax.set_ylim(-0.03, 1.03)
         ax.yaxis.set_major_formatter(lambda v, _: f"{v:.0%}")
@@ -223,5 +227,9 @@ def plot_sae(metrics: dict[str, dict], out_path: Path) -> None:
         for layer, color in zip(layers, colors):
             _line(ax, names, [_get(metrics[n], "sae", str(layer), key) for n in names], color, f"слой {layer}")
         _legend(ax, loc="best")
+    axes[0].set_title("Необъяснённая дисперсия реконструкции (FVU, лог. шкала)", loc="left", fontsize=11, color=INK, pad=8)
+    axes[0].set_yscale("log")
+    axes[0].set_yticks([0.2, 0.5, 1, 2, 5], ["0.2", "0.5", "1", "2", "5"])
+    axes[0].minorticks_off()
     _xticks(axes[2], names)
     _save(fig, out_path)
