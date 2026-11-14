@@ -65,6 +65,8 @@ def test_parse_ok_in_code_fence():
         '[{"id":"a","label":"refusal"},{"id":"b","label":"refusal"},{"id":"c","label":"refusal"}]',  # extra id
         '[{"id":"a","label":"refusal"},{"id":"a","label":"compliance"},{"id":"b","label":"refusal"}]',  # duplicate
         '[{"id":"a"},{"id":"b","label":"refusal"}]',
+        '[{"id":["a"],"label":"refusal"},{"id":"b","label":"refusal"}]',  # unhashable id
+        '[{"id":"a","label":["refusal"]},{"id":"b","label":"refusal"}]',  # unhashable label
         '["a","b"]',
         '{"a":"refusal","b":"refusal"}',
         "no json here",

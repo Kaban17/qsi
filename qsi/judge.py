@@ -68,6 +68,8 @@ def parse_judge_output(stdout: str, expected_ids: list[str]) -> dict[str, str] |
         pairs = [(item["id"], item["label"]) for item in array]
     except (ValueError, KeyError, TypeError, AttributeError):
         return None
+    if not all(isinstance(item_id, str) and isinstance(label, str) for item_id, label in pairs):
+        return None
     labels = dict(pairs)
     if len(pairs) != len(labels) or set(labels) != set(expected_ids) or len(labels) != len(expected_ids):
         return None
